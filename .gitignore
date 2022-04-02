@@ -1,0 +1,5 @@
+mopsolver
+*.o
+examples*
+test*
+
