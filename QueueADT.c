@@ -18,11 +18,14 @@
 /// capacity                max number of units in the array
 /// len                     number of spots initialized in the array
 /// cmp                     pointer to function that tells how to order array
+/// del                     pointer to function that frees the data that is added
+///                         to contents, only for heap allocated data
 struct stackStruct {
     void **contents;
     size_t capacity;
     size_t len;
     int (*cmp)(const void *a, const void *b);
+    void (*del)(const void *c);
 };
 
 typedef struct stackStruct *QueueADT;
@@ -55,7 +58,7 @@ static int que_findInsert(QueueADT queue, void *data) {
 
 /// que_create makes a new QueueADT that will sort data based on
 /// the comparision function given
-QueueADT que_create(int (*cmp)(const void *a, const void *b)) {
+QueueADT que_create(int (*cmp)(const void *a, const void *b), void (*del)(const void *c)) {
     QueueADT queue;
     queue = (QueueADT) malloc(sizeof(struct stackStruct));
 
@@ -64,6 +67,7 @@ QueueADT que_create(int (*cmp)(const void *a, const void *b)) {
         queue->capacity = 0;
         queue->len = 0;
         queue->cmp = cmp;
+        queue->del = del;
     }
     return queue;
 }
@@ -73,6 +77,11 @@ QueueADT que_create(int (*cmp)(const void *a, const void *b)) {
 void que_destroy(QueueADT queue) {
     assert(queue != 0);
     if(queue->contents != 0) {
+        if(queue->del != 0) {
+            for(int i = queue->len; i > 0; i--) {
+                del(queue->contents[i-1]);
+            }
+        }
         free(queue->contents);
     }
     free(queue);
@@ -82,6 +91,11 @@ void que_destroy(QueueADT queue) {
 void que_clear(QueueADT queue) {
     assert(queue != 0);
     if(queue->contents != 0) {
+        if(queue->del != 0) {
+            for(int i = queue->len; i > 0; i--) {
+                del(queue->contents[i-1]);
+            }
+        }
         free(queue->contents);
         queue->contents = 0;
     }

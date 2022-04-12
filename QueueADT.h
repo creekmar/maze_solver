@@ -3,6 +3,7 @@
 // Description:  Interface to the QueueADT module
 //
 // Author:  CS@RIT.EDU
+// Editor:  Ming Creekmore mec5765
 //
 
 #ifndef _QUEUEADT_H_
@@ -23,7 +24,7 @@
 /// QueueADT is a pointer to an abstract queue data structure whose
 /// payload data type is 'generic', implemented as void * in this interface.
 
-typedef struct { } * QueueADT;
+typedef struct stackStruct * QueueADT;
 
 #endif
 
@@ -44,9 +45,11 @@ typedef struct { } * QueueADT;
 ///
 /// @param cmp the address of the comparison function to be used for
 ///    ordering this queue, or NULL if standard FIFO behavior is desired
+/// @param del the address of the delete function used to free specific data
+///    added to the queue, this is for allocated memory
 /// @return a QueueADT instance, or NULL if the allocation fails
 
-QueueADT que_create( int (*cmp)(const void * a, const void * b) );
+QueueADT que_create( int (*cmp)(const void * a, const void * b), void (*del)(const void* c) );
 
 
 /// Tear down and deallocate the supplied QueuADT.
@@ -87,7 +90,8 @@ void que_insert( QueueADT queue, void * data );
 ///     with an error message.  This can be done by printing an
 ///     appropriate message to the standard error output and then
 ///     exiting with EXIT_FAILURE, or by having an assert() fail.
-
+/// Note: if returned value from queue was allocated on the heap, it must be 
+///     freed by the client
 void * que_remove( QueueADT queue );
 
 
