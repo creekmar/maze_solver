@@ -12,8 +12,20 @@
 
 #include <stdbool.h>
 
+#ifndef _MAZE_DATA_
+struct m *maze_data;
+#endif
 
-QueueADT scan_maze(FILE *input);
+/// scan_maze a function to make a new maze_data instance from a file
+///
+/// @param input      file to be read
+/// @return maze_data the maze instance created
+maze_data scan_maze(FILE *input);
+
+/// pretty_print a function to print a maze with good format
+///
+/// @param maze       maze instance to be printed
+void pretty_print(maze_data maze);
 
 
 
