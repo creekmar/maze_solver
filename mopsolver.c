@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
+#include "QueueADT.h"
+#include "map_config.h"
 
 /// usage message as a string
 static char* usage_msg = "Usage:\nmopsolver [-hdsp] [-i INFILE] [-o OUTFILE]\nOptions:\n   -h          Print usage and options list to stdout only.    (Default: off)\n   -d          Pretty-print (display) the maze after reading.  (Default: off)\n   -s          Print length of shortest path or 'No solution'. (Default: off)\n   -p          Pretty-print maze with the path, if one exists. (Default: off)\n   -i infile   Read maze from infile.                          (Default: stdin)\n   -o outfile  Write all output to outfile.                    (Default: stdout)\n";
@@ -43,7 +45,6 @@ void print_struct(options state) {
     printf("Outfile: %s\n", state.outfile);
 }
 
-
 int main(int argc, char *argv[]) {
     static options state = {0, 0, 0, "stdin", "stdout"};
     int opt;
@@ -53,6 +54,7 @@ int main(int argc, char *argv[]) {
         switch(opt) {
         case 'h': //help command
             printf("%s", usage_msg);
+            return EXIT_SUCCESS;
             break;
         case 'd': //display initial maze
             state.display = 1;
@@ -74,8 +76,11 @@ int main(int argc, char *argv[]) {
             break;
         }
     } //end of while loop
-    print_struct(state);
-    printf("\nOptions%d\n\n", opt);
+    FILE *infile;
+    infile = fopen(state.infile, "r");
+    maze_data maze = scan_maze(infile);
+    pretty_print(maze);
+    fclose(infile);
 }
 
 

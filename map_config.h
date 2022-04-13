@@ -13,7 +13,7 @@
 #include <stdbool.h>
 
 #ifndef _MAZE_DATA_
-struct m *maze_data;
+typedef struct m *maze_data;
 #endif
 
 /// scan_maze a function to make a new maze_data instance from a file
@@ -27,6 +27,10 @@ maze_data scan_maze(FILE *input);
 /// @param maze       maze instance to be printed
 void pretty_print(maze_data maze);
 
+/// del_maze deletes a maze_data instance
+///
+/// @param maze       maze to be deleted
+void del_maze(maze_data maze);
 
 
 #endif
