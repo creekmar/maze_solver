@@ -2,4 +2,4 @@ mopsolver
 *.o
 examples*
 test*
-
+errors
