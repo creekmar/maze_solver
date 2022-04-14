@@ -11,6 +11,7 @@
 #define _MAPCONFIG_
 
 #include <stdbool.h>
+#include "coor.h"
 
 #ifndef _MAZE_DATA_
 typedef struct m *maze_data;
@@ -31,6 +32,22 @@ void pretty_print(maze_data maze);
 ///
 /// @param maze       maze instance to be deleted
 void del_maze(maze_data maze);
+
+/// is_solution determines whether the given coordinate instance is the end of 
+///       the maze
+///
+/// @param maze    the maze being analyzed
+/// @param current coordinate instance 
+/// @return        1 if the coor is the maze exit, 0 otherwise
+bool is_solution(maze_data maze, coor current);
+
+/// getNeighbors returns all the posible directions one can go from the given
+/// coordinate
+///
+/// @param maze    the maze being analyzed
+/// @param current the coordinate that you are currently on
+/// @return        a QueueADT of all the possible neighbors
+QueueADT getNeighbors(maze_data maze, coor current);
 
 
 #endif
