@@ -29,7 +29,7 @@ void pretty_print(maze_data maze);
 
 /// del_maze deletes a maze_data instance
 ///
-/// @param maze       maze to be deleted
+/// @param maze       maze instance to be deleted
 void del_maze(maze_data maze);
 
 

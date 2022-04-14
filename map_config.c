@@ -26,6 +26,7 @@ struct m {
     size_t col_capacity;
     size_t row_capacity;
     size_t **contents;
+    bool **visited;
 };
 
 typedef struct m *maze_data;
@@ -111,6 +112,12 @@ maze_data scan_maze(FILE *input) {
         }
         maze->row++;
     }
+    
+    //initialize visited 2d array
+    maze->visited = (bool**) malloc(sizeof(bool)*maze->row);
+    for(size_t i = 0; i < maze->row; i++) {
+        maze->visited[i] = (bool*) malloc(sizeof(bool*)*maze->col);
+    }
         
     return maze;
 }
@@ -158,9 +165,16 @@ void pretty_print(maze_data maze) {
 /// deletes a maze instance
 void del_maze(maze_data maze) {
     assert(maze != 0);
+    //free valid
+    for(size_t i = maze_row-1; i >= 0; i--) {
+        free(maze->visited[i]);
+    }
+    free(maze->visited);
+    //free contents
     for(size_t i = maze_row-1; i >= 0; i--) {
         free(maze->contents[i]);
     }
     free(maze->contents);
     free(maze);
 }
+
