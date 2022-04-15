@@ -25,7 +25,8 @@ struct stackStruct {
     size_t capacity;
     size_t len;
     int (*cmp)(const void *a, const void *b);
-    void (*del)(const void *c);
+    void (*del)(void *c);
+    bool (*equals)(const void *d, const void *e);
 };
 
 typedef struct stackStruct *QueueADT;
@@ -58,7 +59,7 @@ static int que_findInsert(QueueADT queue, void *data) {
 
 /// que_create makes a new QueueADT that will sort data based on
 /// the comparision function given
-QueueADT que_create(int (*cmp)(const void *a, const void *b), void (*del)(const void *c)) {
+QueueADT que_create(int (*cmp)(const void *a, const void *b), void (*del)(void *c), bool (*equals) (const void *d, const void *e)) {
     QueueADT queue;
     queue = (QueueADT) malloc(sizeof(struct stackStruct));
 
@@ -72,6 +73,21 @@ QueueADT que_create(int (*cmp)(const void *a, const void *b), void (*del)(const 
     return queue;
 }
 
+/// que_contains determines whether a queue contains a specific data based 
+/// on the queue's equals() function
+/// if data is in queue, then the index of the element is returned
+int que_contains(QueueADT queue, void *data) {
+    assert(queue != 0);
+    assert(data != 0);
+    for( int i = queue->len; i > 0; i--) {
+        bool compare = queue->equals(queue->contents[i-1], data);
+        if(compare == 1) {
+            return i-1;
+        }
+    }
+    return -1;
+}
+
 /// que_destroy completely frees any memory associated with the 
 /// given queue
 void que_destroy(QueueADT queue) {
@@ -79,7 +95,7 @@ void que_destroy(QueueADT queue) {
     if(queue->contents != 0) {
         if(queue->del != 0) {
             for(int i = queue->len; i > 0; i--) {
-                del(queue->contents[i-1]);
+                queue->del(queue->contents[i-1]);
             }
         }
         free(queue->contents);
@@ -93,7 +109,7 @@ void que_clear(QueueADT queue) {
     if(queue->contents != 0) {
         if(queue->del != 0) {
             for(int i = queue->len; i > 0; i--) {
-                del(queue->contents[i-1]);
+                queue->del(queue->contents[i-1]);
             }
         }
         free(queue->contents);
@@ -139,14 +155,23 @@ void que_insert(QueueADT queue, void *data) {
     }
 }
 
-/// que_remove removes and returns the first element in the list
-void* que_remove(QueueADT queue) {
-    void *data;
+/// que_remove removes and returns specified data in the queue
+/// if data not specified, just returns the first element
+void* que_remove(QueueADT queue, void *data) {
     assert(!que_empty(queue));
-    data = queue->contents[0];
+    int pointer = 0;
 
+    //is data given in the queue (can remove?)
+    if(data == 0) {
+        data = queue->contents[0];
+    }
+    else {
+        pointer = que_contains(queue, data);
+        assert(pointer != -1);
+        data = queue->contents[pointer];
+    }
     //move all data forward/to the left
-    for(size_t i = 0; i < (queue->len-1); i++) {
+    for(size_t i = pointer; i < (queue->len-1); i++) {
         queue->contents[i] = queue ->contents[i+1];
     }
 

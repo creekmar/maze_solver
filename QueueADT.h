@@ -47,9 +47,21 @@ typedef struct stackStruct * QueueADT;
 ///    ordering this queue, or NULL if standard FIFO behavior is desired
 /// @param del the address of the delete function used to free specific data
 ///    added to the queue, this is for allocated memory
+/// @param equals the address of the equals function used to determine whether
+///    two data items are equal
 /// @return a QueueADT instance, or NULL if the allocation fails
 
-QueueADT que_create( int (*cmp)(const void * a, const void * b), void (*del)(const void* c) );
+QueueADT que_create( int (*cmp)(const void * a, const void * b), void (*del)(void* c), bool (*equals)(const void * d, const void * e) );
+
+
+/// Determines whether a specific data is within the queue
+/// 
+/// @param queue - the QueueADT to search in
+/// @param data - the data value to look for
+/// @return - the index that the data is at, otherwise -1 if not in the lise
+/// @exception If the data or queue is null then assert() will fail
+
+int que_contains( QueueADT queue, void * data );
 
 
 /// Tear down and deallocate the supplied QueuADT.
