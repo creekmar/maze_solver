@@ -35,7 +35,26 @@ coor coor_create(size_t row, size_t col, coor prev) {
 }
 
 /// del_coor destroys a coordinate instance but not the prev coordinate
-void del_coor(coor current) {
-    assert(coor != 0);
-    free(current);
+void del_coor(void* current) {
+    coor cur = (coor)(current);
+    assert(cur != 0);
+    free(cur);
+}
+
+/// equals determines whether two given coordinates are equal based on row and col
+bool equals(void* a, void* b) {
+    coor one = (coor) a;
+    coor two = (coor) b;
+    if(one->col == two->col) {
+        if(one->row == two->row) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+/// returns the previous coordinate - the one the current coordinate is linked to
+void * prev(void* current) {
+    void* tmp = (void*) current->prev;
+    return tmp;
 }

@@ -81,7 +81,7 @@ void que_clear( QueueADT queue );
 /// Insert the specified data into the Queue in the appropriate place
 ///
 /// Uses the queue's comparison function to determine the appropriate
-/// place for the insertion.
+/// place for the insertion. If no comparison function, then puts in FILO
 ///
 /// @param queue the QueueADT into which the value is to be inserted
 /// @param data the data to be inserted
@@ -94,9 +94,13 @@ void que_clear( QueueADT queue );
 void que_insert( QueueADT queue, void * data );
 
 
-/// Remove and return the first element from the QueueADT.
+/// Remove and return the a specified element from the QueueADT
+///
+/// Uses the queue's equals function to determine whether data is
+/// in the queue. If no data then removes first element in list
 ///
 /// @param queue the QueueADT to be manipulated
+/// @param data the specific data to remove from the queue
 /// @return the value that was removed from the queue
 /// @exception If the queue is empty, the program should terminate
 ///     with an error message.  This can be done by printing an
@@ -104,7 +108,7 @@ void que_insert( QueueADT queue, void * data );
 ///     exiting with EXIT_FAILURE, or by having an assert() fail.
 /// Note: if returned value from queue was allocated on the heap, it must be 
 ///     freed by the client
-void * que_remove( QueueADT queue );
+void * que_remove( QueueADT queue, void * data );
 
 
 /// Indicate whether or not the supplied Queue is empty
