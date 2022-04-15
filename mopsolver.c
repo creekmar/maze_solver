@@ -12,8 +12,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
+#include <string.h>
 #include "QueueADT.h"
 #include "map_config.h"
+#include "maze_solve.h"
 
 /// usage message as a string
 static char* usage_msg = "Usage:\nmopsolver [-hdsp] [-i INFILE] [-o OUTFILE]\nOptions:\n   -h          Print usage and options list to stdout only.    (Default: off)\n   -d          Pretty-print (display) the maze after reading.  (Default: off)\n   -s          Print length of shortest path or 'No solution'. (Default: off)\n   -p          Pretty-print maze with the path, if one exists. (Default: off)\n   -i infile   Read maze from infile.                          (Default: stdin)\n   -o outfile  Write all output to outfile.                    (Default: stdout)\n";
@@ -33,6 +35,8 @@ struct choices {
 };
 
 typedef struct choices options;
+
+
 
 /// prints the options struct
 /// @param state    the struct to print
@@ -76,11 +80,47 @@ int main(int argc, char *argv[]) {
             break;
         }
     } //end of while loop
+
+    //setup files
     FILE *infile;
-    infile = fopen(state.infile, "r");
+    if(strcmp(state.infile, "stdin") != 0) {
+        infile = fopen(state.infile, "r");
+    }
+    else {
+        infile = stdin;
+    }
     maze_data maze = scan_maze(infile);
-    pretty_print(maze);
-    fclose(infile);
+    FILE *outfile;
+    if(strcmp(state.outfile, "stdout") != 0) {
+        outfile = fopen(state.outfile, "w");
+    }
+    else {
+        outfile = stdout;
+    }
+
+    //do operations based on input flags
+    if(state.display == 1) {
+        pretty_print(maze, outfile);
+    }
+    if(state.solve == 1) {
+        int steps = find_solution(maze);
+        fprintf(outfile, "Solution in %d steps.\n", steps);
+    }
+    if(state.print_solution == 1) {
+        if(state.solve == 0) {
+            find_solution(maze);
+        }
+        pretty_print(maze, outfile);
+    }
+
+    //close files
+    if(strcmp(state.infile, "stdin") != 0) {
+        fclose(infile);
+    }
+    if(strcmp(state.outfile, "stdout") != 0) {
+        fclose(outfile);
+    }
+    del_maze(maze);
 }
 
 
