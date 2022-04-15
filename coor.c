@@ -53,8 +53,3 @@ bool equals(void* a, void* b) {
     return 0;
 }
 
-/// returns the previous coordinate - the one the current coordinate is linked to
-void * prev(void* current) {
-    void* tmp = (void*) current->prev;
-    return tmp;
-}

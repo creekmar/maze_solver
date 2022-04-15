@@ -47,11 +47,4 @@ void del_coor(void *current);
 /// @return     1 if equals, 0 if not equals
 bool equals(void *a, void *b);
 
-/// prev returns the pointer to the coordinate struct that the given coor
-/// points to
-///
-/// @param current   the coordinate struct to look at as a void*
-/// @return          the pointer that the struct contains as a void*
-void * prev(void *current);
-
 #endif
