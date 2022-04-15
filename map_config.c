@@ -121,6 +121,9 @@ maze_data scan_maze(FILE *input) {
     return maze;
 }
 
+/// print_ends prints the border ends of the maze
+///
+/// @param col the number of col in the maze
 static void print_ends(size_t col) {
     printf("|-");
     for(size_t i = 0; i< col; i++) {
@@ -129,13 +132,19 @@ static void print_ends(size_t col) {
     printf("|\n");
 }
 
+/// print_col prints a row of columns given a maze and the row number
+///
+/// @maze the maze to print
+/// @row the row to print
 static void print_col(maze_data maze, size_t row) {
     for(size_t i = 0; i < maze->col; i++) {
-        if(maze->contents[row][i] == 0) {
-            printf(". ");
-        }
-        else {
-            printf("# ");
+        switch(maze->contents[row][i]) {
+            case 0: printf(". ");
+                break;
+            case 1: printf("# ");
+                break;
+            case 2: printf("+ ");
+                break;
         }
     }
 }
@@ -165,71 +174,15 @@ void pretty_print(maze_data maze) {
 void del_maze(maze_data maze) {
     assert(maze != 0);
     //free valid
-    for(size_t i = maze_row-1; i >= 0; i--) {
+    for(size_t i = maze->row-1; i >= 0; i--) {
         free(maze->visited[i]);
     }
     free(maze->visited);
     //free contents
-    for(size_t i = maze_row-1; i >= 0; i--) {
+    for(size_t i = maze->row-1; i >= 0; i--) {
         free(maze->contents[i]);
     }
     free(maze->contents);
     free(maze);
 }
 
-bool is_solution(maze_data maze, coor current) {
-    if(current->row == maze->row-1) {
-        if(current->col == maze->col-1) {
-            if(maze->contents[row][col] == 0) {
-                return 1;
-            }
-        }
-    }
-    return 0;
-}
-
-QueueADT getNeighbors(maze_data maze, coor current) {
-    QueueADT neighbors = que_create(0, &del_coor);
-    size_t row = current->row;
-    size_t col = current->col;
-    //check if row below hasn't been visited and isn't blocked
-    if(row != maze->row-1) {
-        if(maze->contents[row+1][col] == 0 && maze->visited[row+1][col] == 0) {
-            coor below = coor_create(row+1, col, current);
-            maze->visited[row+1][col] = 1;
-            que_insert(neighbors, below);
-        }
-    }
-    //check if row above hasn't been visited and isn't blocked
-    if(row != 0) {
-        if(maze->contents[row-1][col] == 0 && maze->visited[row-1][col] == 0) {
-            coor above = coor_create(row-1, col, current);
-            maze->visited[row-1][col] = 1;
-            que_insert(neighbors, above);
-        }
-    }
-    //check if col right hasn't been visited and isn't blocked
-    if(col != maze->col-1) {
-        if(maze->contents[row][col+1] == 0 && maze->visited[row][col+1] == 0) {
-            coor right = coor_create(row, col+1, current);
-            maze->visited[row][col+1] = 1;
-            que_insert(neighbors, right);
-        }
-    }
-    //check if col left hasn't been visited and isn't blocked
-    if(col != 0) {
-        if(maze->contents[row][col-1] == 0 && maze->visited[row][col-1] == 0) {
-            coor left = coor_create(row, col-1, current);
-            maze->visited[row][col-1] = 1;
-            que_insert(neighbors, left);
-        }
-    }
-
-    //destroy list if there is nothing in there and return null
-    if(que_empty(neighbors)) {
-        que_destroy(neighbors);
-        return 0;
-    }
-
-    return neighbors;
-}
