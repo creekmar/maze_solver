@@ -9,20 +9,7 @@
 
 #include "coor.h"
 #include <assert.h>
-
-/// struct c represents coordinates of a 2D array and also links to the another
-///          coordinate
-///
-/// col      the number of cols
-/// row      the number of rows
-/// prev     the previous struct c (as if you were following a path of coor)
-struct c {
-    size_t col;
-    size_t row;
-    struct c *prev;
-}
-
-typedef struct c *coor;
+#include <stdlib.h>
 
 /// coor_create makes a new coordinate instance
 coor coor_create(size_t row, size_t col, coor prev) {
@@ -42,7 +29,7 @@ void del_coor(void* current) {
 }
 
 /// equals determines whether two given coordinates are equal based on row and col
-bool equals(void* a, void* b) {
+bool equals(const void* a,const void* b) {
     coor one = (coor) a;
     coor two = (coor) b;
     if(one->col == two->col) {

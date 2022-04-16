@@ -7,6 +7,10 @@
 //
 // // // // // // // // // // // // // // // // // // // // // //
 
+#include <stdbool.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 /// struct to hold all maze values
 ///
@@ -15,6 +19,7 @@
 /// col_capacity  the number of units allocated on heap for col
 /// row_capacity  the number of units allocated on heap for row
 /// contents      double array of unsigned int values to represent map
+/// visited       double array of bool to represent visited coordinates
 struct m {
     size_t row;
     size_t col;
@@ -27,16 +32,18 @@ struct m {
 typedef struct m *maze_data;
 
 #define _MAZE_DATA_
-
 #include "maze_solve.h"
+#include "solver.h"
 
 /// is_solution determines whether the data point is the exit of the maze
 bool is_solution(const void *config, const void *curr) {
+    assert(config != 0);
+    assert(curr != 0);
     maze_data maze = (maze_data) config;
     coor current = (coor) curr;
     if(current->row == maze->row-1) {
         if(current->col == maze->col-1) {
-            if(maze->contents[row][col] == 0) {
+            if(maze->contents[maze->row-1][maze->col-1] == 0) {
                 return 1;
             }
         }
@@ -45,7 +52,10 @@ bool is_solution(const void *config, const void *curr) {
 }
 
 /// exit_blocked checks if the entrance and exit of the maze are blocked
-bool exit_blocked(maze_data maze) {
+///
+/// @param maze the maze to check
+/// @return 1 if blocked, 0 if clear
+static bool exit_blocked(maze_data maze) {
     if(maze->contents[0][0] == 1) {
         return 1;
     }
@@ -97,15 +107,18 @@ static void change_row(maze_data maze, size_t row) {
 ///
 /// @param maze the maze to manipulate
 /// @param col the col number to change
-static void change_col(size_t col) {
-    for(size_t i = 0; i > maze->row; i++) {
+static void change_col(maze_data maze,size_t col) {
+    for(size_t i = 0; i < maze->row; i++) {
         maze->contents[i][col] = 2;
     }
 }
 
-/// wall_follower determines if there is a solution along the edges
-bool wall_follower(maze_data maze) {
-
+/// wall_follower determines if there is a solution along the edges of maze
+/// also changes the maze to show the solution path
+///
+/// @param maze the maze to check
+/// @return 1 if there is a path, 0 if no path
+static bool wall_follower(maze_data maze) {
     //check if all clear along top and right edge
     if(check_row(maze, 0)) {
         if(check_col(maze, maze->col-1)) {
@@ -127,19 +140,27 @@ bool wall_follower(maze_data maze) {
     return 0;
 }
 
-/// getNeighbors returns the possible next steps in the path
+/// getNeighbors returns all the posible directions one can go from the given
+/// coordinate
+///
+/// @param maze    the maze being analyzed
+/// @param current the coordinate that you are currently on
+/// @return        a QueueADT of all the possible neighbors
 static QueueADT getNeighbors(void *config, void *curr) {
+    assert(config != 0);
+    assert(curr != 0);
     maze_data maze = (maze_data) config;
     coor current = (coor) curr;
-    QueueADT neighbors = que_create(0, &del_coor);
+    QueueADT neighbors = que_create(0, &del_coor, 0);
     size_t row = current->row;
     size_t col = current->col;
     //check if row below hasn't been visited and isn't blocked
+    
     if(row != maze->row-1) {
         if(maze->contents[row+1][col] == 0 && maze->visited[row+1][col] == 0) {
             coor below = coor_create(row+1, col, current);
             maze->visited[row+1][col] = 1;
-            que_insert(neighbors, below);
+            que_insert(neighbors, (void*) below);
         }
     }
     //check if row above hasn't been visited and isn't blocked
@@ -147,7 +168,7 @@ static QueueADT getNeighbors(void *config, void *curr) {
         if(maze->contents[row-1][col] == 0 && maze->visited[row-1][col] == 0) {
             coor above = coor_create(row-1, col, current);
             maze->visited[row-1][col] = 1;
-            que_insert(neighbors, above);
+            que_insert(neighbors, (void*) above);
         }
     }
     //check if col right hasn't been visited and isn't blocked
@@ -155,7 +176,7 @@ static QueueADT getNeighbors(void *config, void *curr) {
         if(maze->contents[row][col+1] == 0 && maze->visited[row][col+1] == 0) {
             coor right = coor_create(row, col+1, current);
             maze->visited[row][col+1] = 1;
-            que_insert(neighbors, right);
+            que_insert(neighbors, (void*) right);
         }
     }
     //check if col left hasn't been visited and isn't blocked
@@ -163,7 +184,7 @@ static QueueADT getNeighbors(void *config, void *curr) {
         if(maze->contents[row][col-1] == 0 && maze->visited[row][col-1] == 0) {
             coor left = coor_create(row, col-1, current);
             maze->visited[row][col-1] = 1;
-            que_insert(neighbors, left);
+            que_insert(neighbors, (void*) left);
         }
     }
 
@@ -180,17 +201,22 @@ static QueueADT getNeighbors(void *config, void *curr) {
 /// find_solution marks down the quickest solution to maze if there is one and
 /// returns the number of steps
 int find_solution(maze_data maze) {
+    assert(maze != 0);
+    //if blocked exits or wall_follower solution
     if(exit_blocked(maze)) {
         return 0;
     }
-    if(wall_follwer) {
-        return 1;
+    if(wall_follower(maze)) {
+        return maze->row + maze->col-1;
     }
-
+    
+    //run solver to find a solution
+    maze->visited[0][0] = 1;
     coor start = coor_create(0, 0, 0);
     void ** pointers = solve(start, maze, &del_coor, &getNeighbors, &is_solution, &equals);
 
     int steps = 0;
+
     //there is a solution and mark it down
     if(pointers != 0) {
         coor current = (coor) pointers[1];

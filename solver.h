@@ -26,7 +26,8 @@
 ///     are equivalent to each other
 /// @param prev pointer to the function that gets the previous data point based
 ///     on the current data point (ex. backtracking your path)
-/// @return a queue of all the steps in the solution
-QueueADT solve(void *start, void *config, void (*del)(void *a), QueueADT (*getNeigh) (void *b, void *c), bool (*isSolution) (const void *d, const void *e), bool (*equals) (const void *f, const void *g));
+/// @return a list of 2 pointers, the 1st is the hashmap with all possible paths
+///     the 2nd is the endpoint
+void** solve(void *start, void *config, void (*del)(void *a), QueueADT (*getNeigh) (void *b, void *c), bool (*isSolution) (const void *d, const void *e), bool (*equals) (const void *f, const void *g));
 
-
+#endif

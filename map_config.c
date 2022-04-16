@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <stdbool.h>
 #define ALLOC_UNIT 5
 
 /// struct to hold all maze values
@@ -19,6 +20,7 @@
 /// col_capacity  the number of units allocated on heap for col
 /// row_capacity  the number of units allocated on heap for row
 /// contents      double array of unsigned int values to represent map
+/// visited       double array of bool to represented visited coordinates
 struct m {
     size_t row;
     size_t col;
@@ -113,9 +115,12 @@ maze_data scan_maze(FILE *input) {
     }
     
     //initialize visited 2d array
-    maze->visited = (bool**) malloc(sizeof(bool)*maze->row);
+    maze->visited = (bool**) malloc(sizeof(bool*)*maze->row);
     for(size_t i = 0; i < maze->row; i++) {
-        maze->visited[i] = (bool*) malloc(sizeof(bool*)*maze->col);
+        maze->visited[i] = (bool*) malloc(sizeof(bool)*maze->col);
+        for(size_t j = 0; j < maze->col; j++) {
+            maze->visited[i][j] = 0;
+        }
     }
         
     return maze;
@@ -124,63 +129,63 @@ maze_data scan_maze(FILE *input) {
 /// print_ends prints the border ends of the maze
 ///
 /// @param col the number of col in the maze
-static void print_ends(size_t col) {
-    printf("|-");
+static void print_ends(size_t col, FILE * outfile) {
+    fprintf(outfile, "|-");
     for(size_t i = 0; i< col; i++) {
-        printf("--");
+        fprintf(outfile, "--");
     }
-    printf("|\n");
+    fprintf(outfile, "|\n");
 }
 
 /// print_col prints a row of columns given a maze and the row number
 ///
 /// @maze the maze to print
 /// @row the row to print
-static void print_col(maze_data maze, size_t row) {
+static void print_col(maze_data maze, size_t row, FILE * outfile) {
     for(size_t i = 0; i < maze->col; i++) {
         switch(maze->contents[row][i]) {
-            case 0: printf(". ");
+            case 0: fprintf(outfile, ". ");
                 break;
-            case 1: printf("# ");
+            case 1: fprintf(outfile, "# ");
                 break;
-            case 2: printf("+ ");
+            case 2: fprintf(outfile, "+ ");
                 break;
         }
     }
 }
 
 /// pretty_print prints a maze in a nice, readable format
-void pretty_print(maze_data maze) {
+void pretty_print(maze_data maze, FILE * outfile) {
     assert(maze != 0);
     //print first two lines with specific format
-    print_ends(maze->col);
-    printf("  ");
-    print_col(maze, 0);
-    printf("|\n");
+    print_ends(maze->col, outfile);
+    fprintf(outfile, "  ");
+    print_col(maze, 0, outfile);
+    fprintf(outfile, "|\n");
     //prints the body
     for(size_t i = 1; i < maze->row-1; i++) {
-        printf("| ");
-        print_col(maze, i);
-        printf("|\n");
+        fprintf(outfile, "| ");
+        print_col(maze, i, outfile);
+        fprintf(outfile, "|\n");
     }
     //prints last two rows with specific format
-    printf("| ");
-    print_col(maze, maze->row-1);
-    printf("\n");
-    print_ends(maze->col);
+    fprintf(outfile, "| ");
+    print_col(maze, maze->row-1, outfile);
+    fprintf(outfile, "\n");
+    print_ends(maze->col, outfile);
 }
 
 /// deletes a maze instance
 void del_maze(maze_data maze) {
     assert(maze != 0);
     //free valid
-    for(size_t i = maze->row-1; i >= 0; i--) {
-        free(maze->visited[i]);
+    for(size_t i = maze->row; i > 0; i--) {
+        free(maze->visited[i-1]);
     }
     free(maze->visited);
     //free contents
-    for(size_t i = maze->row-1; i >= 0; i--) {
-        free(maze->contents[i]);
+    for(size_t i = maze->row; i > 0; i--) {
+        free(maze->contents[i-1]);
     }
     free(maze->contents);
     free(maze);

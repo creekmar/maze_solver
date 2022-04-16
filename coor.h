@@ -11,6 +11,7 @@
 #define _COOR_H_
 
 #include <stdbool.h>
+#include <stddef.h>
 
 /// struct c represents coordinates of a 2D array and also links to the another
 ///          coordinate
@@ -22,7 +23,7 @@ struct c {
     size_t col;
     size_t row;
     struct c *prev;
-}
+};
 
 typedef struct c *coor;
 
@@ -45,6 +46,6 @@ void del_coor(void *current);
 /// @param a    the first coordinate to compare
 /// @param b    the second coordinate to compare
 /// @return     1 if equals, 0 if not equals
-bool equals(void *a, void *b);
+bool equals(const void *a,const void *b);
 
 #endif

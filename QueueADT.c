@@ -10,7 +10,7 @@
 
 #include <stdlib.h>
 #include <assert.h>
-#include <stdio.h>
+#include <stdbool.h>
 #define ALLOC_UNIT 5
 
 /// struct stackStruct      array of 64 bit values with basic info about array
@@ -20,6 +20,8 @@
 /// cmp                     pointer to function that tells how to order array
 /// del                     pointer to function that frees the data that is added
 ///                         to contents, only for heap allocated data
+/// equals                  pointer to function that determines whether 
+///                         two values are the same
 struct stackStruct {
     void **contents;
     size_t capacity;
@@ -36,6 +38,7 @@ typedef struct stackStruct *QueueADT;
 
 /// que_empty tells whether given queue has any contents
 bool que_empty(QueueADT queue) {
+    assert(queue != 0);
     return (queue->len == 0);
 }
 
@@ -69,6 +72,7 @@ QueueADT que_create(int (*cmp)(const void *a, const void *b), void (*del)(void *
         queue->len = 0;
         queue->cmp = cmp;
         queue->del = del;
+        queue->equals = equals;
     }
     return queue;
 }
@@ -79,7 +83,7 @@ QueueADT que_create(int (*cmp)(const void *a, const void *b), void (*del)(void *
 int que_contains(QueueADT queue, void *data) {
     assert(queue != 0);
     assert(data != 0);
-    for( int i = queue->len; i > 0; i--) {
+    for(int i = queue->len; i > 0; i--) {
         bool compare = queue->equals(queue->contents[i-1], data);
         if(compare == 1) {
             return i-1;
@@ -92,7 +96,7 @@ int que_contains(QueueADT queue, void *data) {
 /// given queue
 void que_destroy(QueueADT queue) {
     assert(queue != 0);
-    if(queue->contents != 0) {
+    if(queue->contents != 0 && queue->len != 0) {
         if(queue->del != 0) {
             for(int i = queue->len; i > 0; i--) {
                 queue->del(queue->contents[i-1]);

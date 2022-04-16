@@ -104,7 +104,12 @@ int main(int argc, char *argv[]) {
     }
     if(state.solve == 1) {
         int steps = find_solution(maze);
-        fprintf(outfile, "Solution in %d steps.\n", steps);
+        if(steps != 0) {
+            fprintf(outfile, "Solution in %d steps.\n", steps);
+        }
+        else {
+            fprintf(outfile, "No Solution.\n");
+        }
     }
     if(state.print_solution == 1) {
         if(state.solve == 0) {

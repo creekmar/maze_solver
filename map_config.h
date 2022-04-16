@@ -14,6 +14,7 @@
 #include "coor.h"
 
 #ifndef _MAZE_DATA_
+#define _MAZE_DATA_
 typedef struct m *maze_data;
 #endif
 
@@ -26,7 +27,8 @@ maze_data scan_maze(FILE *input);
 /// pretty_print a function to print a maze with good format
 ///
 /// @param maze       maze instance to be printed
-void pretty_print(maze_data maze);
+/// @param outfile    the file to print maze solution output on
+void pretty_print(maze_data maze, FILE * outfile);
 
 /// del_maze deletes a maze_data instance
 ///
